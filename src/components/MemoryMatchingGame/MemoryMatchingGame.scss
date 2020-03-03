@@ -1,0 +1,17 @@
+
+.memory-matching-game-container {
+// 100vh viewport verse 100% only the parent
+  background: gray;
+  height: 80vh;
+  width: 80vw;
+  margin-top: calc(10vh - 3px);
+  margin-left: calc(10vw - 3px);
+  border: 3px solid black;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
