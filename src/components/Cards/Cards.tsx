@@ -2,44 +2,62 @@ import React from "react";
 import './Cards.scss';
 import CardsService from "../../services/CardsService";
 import Card from "../Card/Card";
-import {CardType} from "../../models/CardType";
+import { CardType } from "../../models/CardType";
 import shuffle from "shuffle-array";
+import { connect } from "react-redux";
 
-export default class Cards extends  React.Component<any, any> {
+export class Cards extends React.Component<any, any> {
 
     constructor(props: any) {
         super(props);
 
         this.state = {
-            cards: []
+            cards: [],
+            processedCards: []
         };
     }
 
     // When the component mounts onto the DOM; like @NgOnInit
     componentDidMount(): void {
         CardsService.getCards()
-            .then( (resp: any) => this.setState({
-                cards: resp.data.matches
-            }));
+            .then((resp: any) => this.setState({cards: resp.data.matches}, () =>  this.processCards(resp.data.matches)));
     }
 
+    componentDidUpdate(prevProps: any, nextProps: any) {
+        if (prevProps.resetCount !== nextProps.resetCount) {
+            this.processCards(this.state.cards);
+        }
+    }
 
     processCards(cards: any) {
-        const stateCards =  cards.map( (card: any) => {
-            return <Card key={card.id + CardType.STATE}  card={card} cardType={CardType.STATE} />
+        const stateCards = cards.map((card: any) => {
+            return <Card key={card.id + CardType.STATE} card={card} cardType={CardType.STATE} />
         });
-        const capitolCards =  cards.map( (card: any) => {
-            return <Card key={card.id + CardType.CAPITOL}  card={card} cardType={CardType.CAPITOL} />
+        const capitolCards = cards.map((card: any) => {
+            return <Card key={card.id + CardType.CAPITOL} card={card} cardType={CardType.CAPITOL} />
         });
 
-        return shuffle(stateCards.concat(capitolCards));
+        this.setState({
+            processedCards: shuffle(stateCards.concat(capitolCards))
+        });
     }
-    
-    render() {
-        const processedCards = this.processCards(this.state.cards);
 
+    render() {
         return (
-          <div className="cards-container">{processedCards}</div>
+            <div className="cards-container">{this.state.processedCards}</div>
         );
     }
 }
+
+function mapStateToProps(state: any) {
+    return {
+        resetCount: state.revealCardState.resetCount
+    }
+}
+
+
+
+export default connect(
+    mapStateToProps,
+    () => ({})
+)(Cards);

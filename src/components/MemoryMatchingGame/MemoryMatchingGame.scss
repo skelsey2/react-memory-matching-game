@@ -1,6 +1,7 @@
 
 .memory-matching-game-container {
 // 100vh viewport verse 100% only the parent
+  border-radius: 50px;
   background: gray;
   height: 80vh;
   width: 80vw;
@@ -14,4 +15,5 @@
   align-items: center;
   padding: 20px;
   box-sizing: border-box;
+  box-shadow: 5px 5px rgba(0, 0, 0, 0.8);
 }

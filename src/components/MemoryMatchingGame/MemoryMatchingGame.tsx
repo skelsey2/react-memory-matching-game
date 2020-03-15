@@ -4,11 +4,12 @@ import ResetAndScoreContainer from "../ResetAndScoreContainer/ResetAndScoreConta
 import './MemoryMatchingGame.scss'
 
 export class MemoryMatchingGame extends React.Component<any, any> {
+    
     render() {
         return (
             <div className="memory-matching-game-container">
                 <Cards />
-                <ResetAndScoreContainer/>
+                <ResetAndScoreContainer />
             </div>
         )
     }

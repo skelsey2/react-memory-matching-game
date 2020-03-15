@@ -1,8 +1,8 @@
 import React from "react";
-import {CardType} from "../../models/CardType";
+import { CardType } from "../../models/CardType";
 import './Card.scss';
-import {default as MuiCard} from '@material-ui/core/Card';
-import {connect} from "react-redux";
+import { default as MuiCard } from '@material-ui/core/Card';
+import { connect } from "react-redux";
 import CardModel from "../../models/CardModel";
 
 class Card extends React.Component<any, any> {
@@ -11,35 +11,37 @@ class Card extends React.Component<any, any> {
     constructor(props: any, context: any) {
         super(props, context);
 
-        this.cardModel = new CardModel(props.card.id, props.card.type);
+        this.cardModel = new CardModel(props.card.id, props.cardType);
+        this.state = {
+            flipped: false
+        }
     }
 
     render() {
         console.log('in render');
-        const cardData =  this.getCardDataOrX();
+        const cardData = this.getRevealedData();
+        const flipped = this.getIsFlipped();
 
         return (
-            <MuiCard  variant="outlined" className="card">
-                    <span onClick={ (event) => this.handleRevealCardClick(event) }>{cardData}</span>
-            </MuiCard>
+            <div onClick={(event) => this.handleRevealCardClick(event)}
+                className={`card ${flipped && "flipped"}`}>
+                    <div className="a-card-side front">X</div>
+                    <div className="a-card-side back">{cardData}</div>
+            </div>
         );
     }
-
-    private getCardDataOrX() {
+    getIsFlipped() {
         // Revealing Cards, not checking for Match Logic
         // Matching logic done prior in reducer
-        console.log(' in get card data', this);
-        if (this.props.revealedCardSetDS.has(this.cardModel)) {
-
-            return this.getRevealedData();
-        }
-        return 'X';
+        // console.log(' in get card data', this);
+        return this.props.revealedCardSetDS.has(this.cardModel) ||
+            this.props.currentGuessedCards.has(this.cardModel);
     }
 
-    private getRevealedData(){
-        if(this.props.cardType === CardType.CAPITOL) {
+    private getRevealedData() {
+        if (this.props.cardType === CardType.CAPITOL) {
             return this.props.card.capitol;
-        } else{
+        } else {
             return this.props.card.state;
         }
     }
@@ -48,6 +50,10 @@ class Card extends React.Component<any, any> {
         console.log('reveal card click');
         // dispatches an action
         this.props.blah(this.cardModel);
+
+        this.setState({
+            flipped: !this.state.flipped
+        })
     }
 }
 
@@ -56,17 +62,19 @@ class Card extends React.Component<any, any> {
 // https://react-redux.js.org/using-react-redux/connect-mapstate
 function mapStateToProps(state: any) {
     return {
-        revealedCardSetDS: state.revealedCardSetDS,
-        currentGuessedCards: state.currentGuessedCards
+        revealedCardSetDS: state.revealCardState.revealedCardSetDS,
+        currentGuessedCards: state.revealCardState.currentGuessedCards
     };
 }
 
-const mapDispatchToProps = (dispatch: any) => ({
-    blah: (cardModel: any) => dispatch({
-        type: "REVEAL_CARD",
-        cardModel: cardModel
-    })
-});
+const mapDispatchToProps = (dispatch: any) => {
+    return {
+        blah: (cardModel: any) => dispatch({
+            type: "REVEAL_CARD",
+            cardModel: cardModel
+        })
+    };
+};
 
 //      Redux Wrapped
 export default connect(
