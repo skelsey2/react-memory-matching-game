@@ -9,18 +9,19 @@ const initialState = {
 
 //  test remove initState
 export const revealCardStateReducer = (state = initialState,
-                                       action: { type: any; cardModel: CardModel, asyncDispatch: any, resetCount: number }) => {
-    console.log(' in reducer', state, action);
+    action: { type: any; cardModel: CardModel, asyncDispatch: any, resetCount: number }) => {
+    console.log(' RevealState Reducer: ' + action.type, state, action);
 
     switch (action.type) {
         case "REVEAL_CARD":
-            if(state.gameLocked){
-                return {...state};
+            if (state.gameLocked) {
+                return { ...state };
             }
 
             if (state.currentGuessedCards.size === 0) {
                 const currentGuessedCards = new Set(state.currentGuessedCards);
                 return {
+                    ...state,
                     revealedCardSetDS: state.revealedCardSetDS,
                     currentGuessedCards: currentGuessedCards.add(action.cardModel)
                 };
@@ -32,9 +33,9 @@ export const revealCardStateReducer = (state = initialState,
                 const didFindComplementCard = priorGuessedCard.id === action.cardModel.id && priorGuessedCard.type !== action.cardModel.type;
 
                 if (didFindComplementCard) {
-                    console.log('got in complement case');
                     const revealedCardSetDS = new Set(state.revealedCardSetDS).add(priorGuessedCard).add(action.cardModel);
                     return {
+                        ...state,
                         revealedCardSetDS: revealedCardSetDS, // has 2 cards in it
                         currentGuessedCards: new Set()
                     };
@@ -45,6 +46,7 @@ export const revealCardStateReducer = (state = initialState,
                     type: "HIDE_CARDS"
                 }), 1000);
                 return {
+                    ...state,
                     revealedCardSetDS: state.revealedCardSetDS,
                     currentGuessedCards: currentGuessedCards.add(action.cardModel),
                     gameLocked: true
@@ -54,24 +56,28 @@ export const revealCardStateReducer = (state = initialState,
 
         case "HIDE_CARDS":
             return {
+                ...state,
                 revealedCardSetDS: state.revealedCardSetDS,
                 currentGuessedCards: new Set(),
                 gameLocked: false
             };
 
         case "RESET_CARDS":
-
             return {
-                ...initialState,
-                resetCount: state.resetCount + 1
+                revealedCardSetDS: new Set<CardModel>(),
+                currentGuessedCards: new Set<CardModel>(),
+                gameLocked: false,
+                resetCount: ++state.resetCount
             };
 
         default:
             console.log('hit default case');
             return {
+                ...state,
                 revealedCardSetDS: state.revealedCardSetDS,
                 currentGuessedCards: state.currentGuessedCards,
-                gameLocked: false
+                gameLocked: false,
+                
             }
     }
 };

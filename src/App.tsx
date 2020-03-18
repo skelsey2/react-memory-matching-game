@@ -6,7 +6,7 @@ import {Provider} from "react-redux";
 import {createStore, applyMiddleware} from "redux";
 import {revealCardStateReducer} from "./reducer/revealState";
 import asyncDispatchMiddleWare from "./middleware/asyncDispatchMiddleWare";
-import { combineReducers } from 'redux';
+import { combineReducers, compose } from 'redux';
 
 function App() {
 
@@ -15,7 +15,10 @@ function App() {
     });
 
     // @ts-ignore
-    const store = createStore(reducers, applyMiddleware(asyncDispatchMiddleWare));
+    const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+
+    // @ts-ignore
+    const store = createStore(reducers, composeEnhancers(applyMiddleware(asyncDispatchMiddleWare)));
     return (
         <MuiThemeProvider>
             <Provider store={store}>

@@ -1,10 +1,10 @@
 import React from "react";
-import './Cards.scss';
+import { connect } from "react-redux";
+import shuffle from "shuffle-array";
+import { CardType } from "../../models/CardType";
 import CardsService from "../../services/CardsService";
 import Card from "../Card/Card";
-import { CardType } from "../../models/CardType";
-import shuffle from "shuffle-array";
-import { connect } from "react-redux";
+import './Cards.scss';
 
 export class Cards extends React.Component<any, any> {
 
@@ -23,8 +23,14 @@ export class Cards extends React.Component<any, any> {
             .then((resp: any) => this.setState({cards: resp.data.matches}, () =>  this.processCards(resp.data.matches)));
     }
 
+    /**
+     * Invoked on Reset
+     * @param prevProps 
+     * @param nextProps 
+     */
     componentDidUpdate(prevProps: any, nextProps: any) {
-        if (prevProps.resetCount !== nextProps.resetCount) {
+        console.log('CARDS - componentDidUpdate' + this.props.resetCount);
+        if (prevProps.resetCount !== this.props.resetCount) {
             this.processCards(this.state.cards);
         }
     }
@@ -54,7 +60,6 @@ function mapStateToProps(state: any) {
         resetCount: state.revealCardState.resetCount
     }
 }
-
 
 
 export default connect(

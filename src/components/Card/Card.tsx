@@ -1,9 +1,8 @@
 import React from "react";
-import { CardType } from "../../models/CardType";
-import './Card.scss';
-import { default as MuiCard } from '@material-ui/core/Card';
 import { connect } from "react-redux";
 import CardModel from "../../models/CardModel";
+import { CardType } from "../../models/CardType";
+import './Card.scss';
 
 class Card extends React.Component<any, any> {
     private cardModel: CardModel;
@@ -12,30 +11,32 @@ class Card extends React.Component<any, any> {
         super(props, context);
 
         this.cardModel = new CardModel(props.card.id, props.cardType);
-        this.state = {
-            flipped: false
-        }
     }
 
     render() {
-        console.log('in render');
         const cardData = this.getRevealedData();
         const flipped = this.getIsFlipped();
 
         return (
             <div onClick={(event) => this.handleRevealCardClick(event)}
                 className={`card ${flipped && "flipped"}`}>
-                    <div className="a-card-side front">X</div>
-                    <div className="a-card-side back">{cardData}</div>
+                <div className="a-card-side front">X</div>
+                <div className="a-card-side back">{cardData}</div>
             </div>
         );
     }
+
     getIsFlipped() {
         // Revealing Cards, not checking for Match Logic
         // Matching logic done prior in reducer
         // console.log(' in get card data', this);
-        return this.props.revealedCardSetDS.has(this.cardModel) ||
-            this.props.currentGuessedCards.has(this.cardModel);
+        return this.doCardsStructurallyContainCard(this.props.revealedCardSetDS, this.cardModel) ||
+            this.doCardsStructurallyContainCard(this.props.currentGuessedCards, this.cardModel);
+    }
+
+    doCardsStructurallyContainCard(cards: Set<CardModel>, card: CardModel) {
+        return Array.from(cards)
+            .some(element => card.equals(element));
     }
 
     private getRevealedData() {
@@ -47,13 +48,8 @@ class Card extends React.Component<any, any> {
     }
 
     private handleRevealCardClick(event: any) {
-        console.log('reveal card click');
         // dispatches an action
         this.props.blah(this.cardModel);
-
-        this.setState({
-            flipped: !this.state.flipped
-        })
     }
 }
 

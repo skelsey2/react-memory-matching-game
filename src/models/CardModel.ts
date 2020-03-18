@@ -25,4 +25,8 @@ export default class CardModel {
     set type(value: CardType) {
         this._type = value;
     }
+
+    equals(cardModel: CardModel) {
+        return this._type === cardModel.type && this._id === cardModel.id;
+    }
 }
